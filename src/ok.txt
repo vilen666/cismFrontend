@@ -1,0 +1,79 @@
+/* Calcutta Institute of Engineering and Management offers one of the most beautiful, robust and high-tech campus in India. Various facilities are available for our students in our campus. */
+
+position: absolute;
+width: 506px;
+height: 274px;
+left: 111px;
+top: 382px;
+
+font-family: 'CantoraOne';
+font-style: normal;
+font-weight: 400;
+font-size: 32px;
+line-height: 40px;
+letter-spacing: -0.03em;
+
+color: #FFFFFF;
+style={{backgroundImage: `url("${(file)?(URL.createObjectURL(file)):("")}")`,
+                                backgroundSize: 'cover',
+                                backgroundPosition: 'center'}}
+/* Rectangle 46 */
+
+position: absolute;
+width: 1440px;
+height: 419px;
+left: 0px;
+top: 185px;
+
+background: #253186;
+box-shadow: 0px 4px 9.8px rgba(0, 0, 0, 0.5);
+
+/* Bikram Dumrya and Supratim Lala are one of the best student we ever get. We are very proud and also very glad by teaching them. We wish they become more and more successful in their life. */
+
+position: absolute;
+width: 515px;
+height: 200px;
+left: 108px;
+top: 316px;
+
+font-family: 'Cambria';
+font-style: normal;
+font-weight: 400;
+font-size: 32px;
+line-height: 38px;
+
+color: #FFFFFF;
+
+/* Frame 1 */
+
+position: absolute;
+width: 1226px;
+height: 726px;
+left: calc(50% - 1226px/2);
+top: calc(50% - 726px/2 - 502px);
+
+background: #A4CEFF;
+box-shadow: 0px 0px 45.3px 7px rgba(0, 0, 0, 0.5);
+backdrop-filter: blur(2px);
+/* Note: backdrop-filter has minimal browser support */
+border-radius: 13px;
+
+/*  24, 1A, Chandi Ghosh Rd, Ashok Nagar, Tollygunge, Kolkata, West Bengal 700040 */
+
+position: absolute;
+width: 654px;
+height: 24px;
+left: 152px;
+top: 78px;
+
+font-family: 'Poppins';
+font-style: normal;
+font-weight: 600;
+font-size: 16px;
+line-height: 24px;
+/* identical to box height */
+text-decoration-line: underline;
+
+color: #3B3F3F;
+
+

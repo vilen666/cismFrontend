@@ -1,0 +1,7 @@
+/* @font-face {
+    font-family: 'customFont'; /* Name your font family */
+    /* src: url('./font/PlaywriteDEGrund-VariableFont_wght.ttf'); /* Locate the .ttf file within your directory*/
+  /*} */
+  .header{
+    font-family: "Poppins";
+  }
