@@ -10,12 +10,15 @@ const Campus = () => {
         const fetchNames = async () => {
             try {
                 let response = await axios.get('/admin/campus/names')
+                console.log(response)
                 if (!response.data.success) {
-                    console.log("oigj")
                     throw new Error(response.data.data)
                 }
                 setName(response.data.campuses || [])
+                console.log("oigj")
                 setoptionNum(Math.floor(Name.length / 2))
+                console.log("ojbb")
+
             }
             catch (err) {
                 console.log(err.message)
