@@ -66,8 +66,8 @@ const Courses = () => {
         const fetchData = async () => {
             try {
                 let response = await axios.get("/admin/courses");
-                setbranches(response.data.branches)
-                setcourses(response.data.courses)
+                setbranches(response.data.branches || [])
+                setcourses(response.data.courses || [])
             }
             catch (err) {
                 toast.error(err.message)
@@ -75,7 +75,6 @@ const Courses = () => {
 
         }
         fetchData()
-        console.log(branches)
     }, []);
     return (
         <>
@@ -91,7 +90,7 @@ const Courses = () => {
                                     <hr className=' border-black border-1 mr-[50%] mb-12 rounded-full' />
                                     <div className='w-full grid grid-cols-4 gap-20 mb-10'>
                                         {
-                                            courses[0]&&courses.filter(course => course.branch === branch).map((course) => {
+                                            courses[0] && courses.filter(course => course.branch === branch).map((course) => {
                                                 return (
                                                     <>
                                                         <div className='h-[275px] rounded-xl overflow-hidden relative'
