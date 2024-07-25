@@ -91,7 +91,7 @@ const Courses = () => {
                                     <hr className=' border-black border-1 mr-[50%] mb-12 rounded-full' />
                                     <div className='w-full grid grid-cols-4 gap-20 mb-10'>
                                         {
-                                            courses.filter(course => course.branch === branch).map((course) => {
+                                            courses[0]&&courses.filter(course => course.branch === branch).map((course) => {
                                                 return (
                                                     <>
                                                         <div className='h-[275px] rounded-xl overflow-hidden relative'
@@ -114,7 +114,7 @@ const Courses = () => {
                 <hr className=' border-black border-[2px] mx-[45%] mb-12 rounded-full' />
 
             </div>
-            <Footer></Footer>
+            <Footer/>
         </>
     )
 }
