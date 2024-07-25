@@ -15,13 +15,10 @@ const Campus = () => {
                     throw new Error(response.data.data)
                 }
                 setName(response.data.campuses || [])
-                console.log("oigj")
-                // setoptionNum(Math.floor(response.data.campuses.length / 2))
-                console.log("ojbb")
-
+                setoptionNum(Math.floor(response.data.campuses.length / 2))
             }
             catch (err) {
-                console.log(err.message)
+                console.log(err)
                 toast.error(err.message)
             }
         }
