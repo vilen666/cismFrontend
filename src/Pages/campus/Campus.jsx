@@ -16,7 +16,7 @@ const Campus = () => {
                 }
                 setName(response.data.campuses || [])
                 console.log("oigj")
-                setoptionNum(Math.floor(Name.length / 2))
+                setoptionNum(Math.floor(response.data.campuses.length / 2))
                 console.log("ojbb")
 
             }
