@@ -12,7 +12,7 @@ const RequestCall = () => {
   const handleSubmit=async (e)=>{
     e.preventDefault();
     try {
-      let response = await axios.post("/contact",{text:`Hello I am ${name}. Phone No.: ${phone}, Qualification: ${qualifi}, Marks Obtained: ${mark} out of ${fullMark} and I am Interested in ${choice}`})
+      let response = await axios.get("https://cismbackend.onrender.com/contact",{text:`Hello I am ${name}. Phone No.: ${phone}, Qualification: ${qualifi}, Marks Obtained: ${mark} out of ${fullMark} and I am Interested in ${choice}`})
       console.log(response.data)
       if(!response.data.success)
       {

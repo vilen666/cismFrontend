@@ -65,7 +65,7 @@ const Courses = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                let response = await axios.get("/admin/courses");
+                let response = await axios.get("https://cismbackend.onrender.com/admin/courses");
                 setbranches(response.data.branches || [])
                 setcourses(response.data.courses || [])
             }

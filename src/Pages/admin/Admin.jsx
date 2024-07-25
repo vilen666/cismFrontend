@@ -13,7 +13,7 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('/admin/login', { user, password }, { withCredentials: true });
+            const response = await axios.get('https://cismbackend.onrender.com/admin/login', { user, password }, { withCredentials: true });
             if (response.data.success) {
                 // Handle successful login (e.g., store token, redirect, etc.)
                 toast.success(response.data.data);
@@ -54,7 +54,7 @@ const Register = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('/admin/register', { user, password });
+            const response = await axios.get('https://cismbackend.onrender.com/admin/register', { user, password });
             if (response.data.success) {
                 // Handle successful login (e.g., store token, redirect, etc.)
                 toast.success(response.data.data);
@@ -90,7 +90,7 @@ const Portal = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('/admin/portal', {
+                const response = await axios.get('https://cismbackend.onrender.com/admin/portal', {
                     withCredentials: true // Include cookies in the request
                 });
                 if (!response.data.success) {
@@ -135,7 +135,7 @@ const EditAdmin = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('/admin', {
+                const response = await axios.get('https://cismbackend.onrender.com/admin', {
                     withCredentials: true // Include cookies in the request
                 });
                 if (response.data.success) {
@@ -155,7 +155,7 @@ const EditAdmin = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('/admin/edit', { oldUser, user, pass }, { withCredentials: true });
+            const response = await axios.get('https://cismbackend.onrender.com/admin/edit', { oldUser, user, pass }, { withCredentials: true });
             if (response.data.success) {
                 toast.success(response.data.data);
                 navigate("/admin/logout")
@@ -204,7 +204,7 @@ const EditCourse = () => {
         formData.append('branch', newBranch);
         formData.append('image', file); // Assuming 'file' is the state variable for the selected file
         try {
-            const response = await axios.post('/admin/courses/upload', formData, {
+            const response = await axios.get('https://cismbackend.onrender.com/admin/courses/upload', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 },
@@ -340,7 +340,7 @@ const EditCampus = () => {
         });
 
         try {
-            const response = await axios.post('/admin/campus/upload', formData, {
+            const response = await axios.get('https://cismbackend.onrender.com/admin/campus/upload', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -356,7 +356,7 @@ const EditCampus = () => {
     useEffect(() => {
         const fetchNames = async () => {
             try {
-                let response = await axios.get('/admin/campus/names')
+                let response = await axios.get('https://cismbackend.onrender.com/admin/campus/names')
                 if (!response.data.success) {
                     throw new Error(response.data.data)
                 }
@@ -419,7 +419,7 @@ const ImageSection = ({ name }) => {
             })
             formData.append('pictures', JSON.stringify(Pictures))
             formData.append('name', name)
-            let response = await axios.post('/admin/campus/update', formData,
+            let response = await axios.get('https://cismbackend.onrender.com/admin/campus/update', formData,
                 {
                     headers: {
                         'Content-Type': 'multipart/form-data'
@@ -439,7 +439,7 @@ const ImageSection = ({ name }) => {
     useEffect(() => {
         const fetchPictures = async () => {
             try {
-                let response = await axios.get('/admin/campus/' + name)
+                let response = await axios.get('https://cismbackend.onrender.com/admin/campus/' + name)
                 if (!response.data.success) {
                     throw new Error(response.data.data)
                 }
