@@ -9,7 +9,7 @@ const Campus = () => {
     useEffect(() => {
         const fetchNames = async () => {
             try {
-                let response = await axios.get('/admin/campus/names')
+                let response = await axios.get('https://cismbackend.onrender.com/admin/campus/names')
                 console.log(response)
                 if (!response.data.success) {
                     throw new Error(response.data.data)
@@ -95,7 +95,7 @@ const [Pictures, setPictures] = useState([]);
   useEffect(() => {
     const fetchPictures = async () => {
         try {
-            let response = await axios.get('/admin/campus/' + name)
+            let response = await axios.get('admin/campus/' + name)
             if (!response.data.success) {
                 throw new Error(response.data.data)
             }
