@@ -5,8 +5,8 @@ import { useState,useEffect } from 'react'
 import { toast } from 'react-toastify'
 import axios from 'axios'
 const Courses = () => {
-    const [branches, setbranches] = useState([]);
-    const [courses, setcourses] = useState([]);
+    const [branches, setbranches] = useState(Array(1).fill(null));
+    const [courses, setcourses] = useState(Array(1).fill(null));
     // const course=[
     //     {
     //         id:"AICTE",
@@ -75,10 +75,11 @@ const Courses = () => {
 
         }
         fetchData()
+        console.log(branches)
     }, []);
     return (
         <>
-            <Header></Header>
+            <Header/>
             <div className=' w-full h-fit p-5'>
                 {!branches[0] && <div className=' text-3xl mt-24 w-fit mx-auto'>No Data Available</div>}
                 {

@@ -54,7 +54,7 @@ const Header = () => {
               navs.map((item) => {
                 return (
                   <>
-                    <a href={item.ref} className='navBut px-3 rounded'>{item.id}</a>
+                    <a href={item.ref} className='navBut px-3 rounded' key={item.id}>{item.id}</a>
                   </>
                 )
               })

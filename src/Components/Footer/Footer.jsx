@@ -45,7 +45,7 @@ const Footer = () => {
                             {
                                 socials.map((item)=>{
                                     return(
-                                        <a href={item.ref} target='_blank' className='w-[50px] h-[50px] mb-10 ml-4 ' style={{backgroundImage:`url(${item.src})`,backgroundPosition:"center",backgroundSize:"cover"}}></a>
+                                        <a href={item.ref} key={item.id} target='_blank' className='w-[50px] h-[50px] mb-10 ml-4 ' style={{backgroundImage:`url(${item.src})`,backgroundPosition:"center",backgroundSize:"cover"}}></a>
                                     )
                                 })
                             }
