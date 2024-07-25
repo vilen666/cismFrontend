@@ -5,7 +5,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 const Campus = () => {
     const [Name, setName] = useState([]);
-    const [optionNum, setoptionNum] = useState(Math.floor(Name.length / 2));
+    const [optionNum, setoptionNum] = useState(0);
     useEffect(() => {
         const fetchNames = async () => {
             try {
@@ -14,6 +14,7 @@ const Campus = () => {
                     throw new Error(response.data.data)
                 }
                 setName(response.data.campuses || [])
+                setoptionNum(Math.floor(Name.length / 2))
             }
             catch (err) {
                 console.log(err.message)
@@ -97,10 +98,11 @@ const [Pictures, setPictures] = useState([]);
             if (!response.data.success) {
                 throw new Error(response.data.data)
             }
-            setPictures(response.data.pictures)
+            setPictures(response.data.pictures || [])
         }
         catch (err) {
             toast.error(err.message)
+            console.log(err.message)
         }
     }
     fetchPictures()
