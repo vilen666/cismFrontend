@@ -13,9 +13,10 @@ const Campus = () => {
                 if (!response.data.success) {
                     throw new Error(response.data.data)
                 }
-                setName(response.data.campuses)
+                setName(response.data.campuses || [])
             }
             catch (err) {
+                console.log(err.message)
                 toast.error(err.message)
             }
         }
