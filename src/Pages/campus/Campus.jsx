@@ -11,6 +11,7 @@ const Campus = () => {
             try {
                 let response = await axios.get('/admin/campus/names')
                 if (!response.data.success) {
+                    console.log("oigj")
                     throw new Error(response.data.data)
                 }
                 setName(response.data.campuses || [])
