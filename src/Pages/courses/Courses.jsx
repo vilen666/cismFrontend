@@ -83,7 +83,7 @@ const Courses = () => {
             <div className=' w-full h-fit p-5'>
                 {!branches[0] && <div className=' text-3xl mt-24 w-fit mx-auto'>No Data Available</div>}
                 {
-                    branches.map((branch) => {
+                    branches[0]&&branches.map((branch) => {
                         return (
                             <>
                                 <div>
