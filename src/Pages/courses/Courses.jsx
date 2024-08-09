@@ -4,70 +4,22 @@ import Footer from "../../Components/Footer/Footer"
 import { useState,useEffect } from 'react'
 import { toast } from 'react-toastify'
 import axios from 'axios'
+import { useLoading } from '../..'
 const Courses = () => {
     const [branches, setbranches] = useState(Array(1).fill(null));
     const [courses, setcourses] = useState(Array(1).fill(null));
-    // const course=[
-    //     {
-    //         id:"AICTE",
-    //         sub:[
-    //             {
-    //                 id:"Computer Science Engineering",
-    //                 src:require("./imgs/cse.avif"),
-    //             },
-    //             {
-    //                 id:"Civil Engineering ",
-    //                 src:require("./imgs/civil.avif"),
-    //             },
-    //             {
-    //                 id:"Electronics And Communication Engineering",
-    //                 src:require("./imgs/ece.avif"),
-    //             },
-    //             {
-    //                 id:"Electrical Engineering",
-    //                 src:require("./imgs/ee.avif"),
-    //             },
-    //             {
-    //                 id:"Information Technology",
-    //                 src:require("./imgs/it.avif"),
-    //             },
-    //             {
-    //                 id:"Masters of Business Administration",
-    //                 src:require("./imgs/mba.avif"),
-    //             },
-    //         ]
-    //     },
-    //     {
-    //         id:"NON-AICTE",
-    //         sub:[
-    //             {
-    //                 id:"Bachelor of Computer Application",
-    //                 src:require("./imgs/bca.avif"),
-    //             },
-    //             {
-    //                 id:"BBA Business Analytics",
-    //                 src:require("./imgs/ba.avif"),
-    //             },
-    //             {
-    //                 id:"Bachelor of Business Administration",
-    //                 src:require("./imgs/bba.avif"),
-    //             },
-    //             {
-    //                 id:"Bachelor of Medical Labaratory Technology",
-    //                 src:require("./imgs/bmlt.avif"),
-    //             },
-    //             {
-    //                 id:"B.SC Data Science",
-    //                 src:require("./imgs/data.avif"),
-    //             }]
-    //     }
-    // ]
+    const {setLoading}=useLoading();
     useEffect(() => {
         const fetchData = async () => {
             try {
-                let response = await axios.get("https://cismbackend.onrender.com/admin/courses");
+                setLoading(prev=>!prev)
+                let response = await axios.get("http://localhost:5000/admin/courses");
                 setbranches(response.data.branches || [])
                 setcourses(response.data.courses || [])
+                setLoading(prev=>!prev)
+                if(!response.data.success){
+                    throw new Error(response.data.data)
+                }
             }
             catch (err) {
                 toast.error(err.message)
@@ -80,9 +32,8 @@ const Courses = () => {
         <>
             <Header/>
             <div className=' w-full h-fit p-5'>
-                {!branches[0] && <div className=' text-3xl mt-24 w-fit mx-auto'>No Data Available</div>}
                 {
-                    branches[0]&&branches.map((branch) => {
+                    branches[0]?(branches.map((branch) => {
                         return (
                             <>
                                 <div>
@@ -108,10 +59,9 @@ const Courses = () => {
 
                             </>
                         )
-                    })
+                    })):<div className=' text-xl md:text-3xl mt-24 w-fit mx-auto'>No Data Available</div>
                 }
                 <hr className=' border-black border-[2px] mx-[45%] mb-12 rounded-full' />
-
             </div>
             <Footer/>
         </>

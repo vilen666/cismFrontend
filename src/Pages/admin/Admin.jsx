@@ -4,29 +4,28 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 import { useNavigate } from 'react-router-dom';
 import imgCollege from "../home/imgs/3.png"
-
+import { motion } from "framer-motion"
+import { useLoading } from '../..'
 const Login = () => {
     const [user, setUser] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
     const navigate = useNavigate()
+    const { setLoading } = useLoading()
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.get('https://cismbackend.onrender.com/admin/login', { user, password }, { withCredentials: true });
+            setLoading(prev => !prev)
+            const response = await axios.post('http://localhost:5000/admin/login', { user, password }, { withCredentials: true });
+            setLoading(prev => !prev)
             if (response.data.success) {
                 // Handle successful login (e.g., store token, redirect, etc.)
                 toast.success(response.data.data);
                 navigate("/admin/portal")
             } else {
-                toast.error(response.data.data);
-                navigate("/admin/portal")
+                throw new Error(response.data.data)
             }
         } catch (err) {
-            setError('An error occurred. Please try again later.');
-            toast.error(error);
-            navigate("/admin/portal")
-
+            toast.error(err.message);
         }
     };
     return (
@@ -50,22 +49,23 @@ const Register = () => {
     const [user, setUser] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const { setLoading } = useLoading()
     const navigate = useNavigate()
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.get('https://cismbackend.onrender.com/admin/register', { user, password });
+            setLoading(prev => !prev)
+            const response = await axios.post('http://localhost:5000/admin/register', { user, password });
+            setLoading(prev => !prev)
             if (response.data.success) {
-                // Handle successful login (e.g., store token, redirect, etc.)
                 toast.success(response.data.data);
                 navigate("/admin")
             } else {
-                toast.error(response.data.data);
+                throw new Error("")
             }
         } catch (err) {
             setError('An error occurred. Please try again later.');
             toast.error(error);
-            navigate("/admin")
         }
     };
     return (
@@ -75,9 +75,9 @@ const Register = () => {
                     <img src={require("./imgs/1.png")} alt="#" className=' w-[25%] h-[20%]' />
                     <form onSubmit={handleSubmit} className=' w-[80%] h-[70%] p-3 flex flex-col items-center justify-center gap-0 bg-[#D9D9D9] rounded text-lg' style={{ boxShadow: "rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px" }}>
                         <label htmlFor="username" className=' w-full text-left font-bold  uppercase'>Username</label>
-                        <input type="text" name="username" className='px-2 w-full mb-5 border-2 border-blue-800 rounded' onChange={(e) => setUser(e.target.value)} />
+                        <input type="text" required name="username" className='px-2 w-full mb-5 border-2 border-blue-800 rounded' onChange={(e) => setUser(e.target.value)} />
                         <label htmlFor="password" className=' w-full text-left font-bold uppercase'>Password</label>
-                        <input type="text" name="password" className='px-2 w-full mb-5 border-2 border-blue-800 rounded' onChange={(e) => setPassword(e.target.value)} />
+                        <input type="text" required name="password" className='px-2 w-full mb-5 border-2 border-blue-800 rounded' onChange={(e) => setPassword(e.target.value)} />
                         <input type="submit" className=' w-[50%] bg-blue-600 rounded-full text-xl' value="Register" />
                     </form>
                 </div>
@@ -86,13 +86,16 @@ const Register = () => {
     )
 }
 const Portal = () => {
+    const { setLoading } = useLoading()
     const navigate = useNavigate()
     useEffect(() => {
-        const fetchData = async () => {
+        const checkLogin = async () => {
             try {
-                const response = await axios.get('https://cismbackend.onrender.com/admin/portal', {
+                setLoading(prev => !prev)
+                const response = await axios.get('http://localhost:5000/admin/portal', {
                     withCredentials: true // Include cookies in the request
                 });
+                setLoading(prev => !prev)
                 if (!response.data.success) {
                     throw new Error(response.data.data);
                 }
@@ -101,31 +104,31 @@ const Portal = () => {
                 navigate("/admin");
             }
         };
-        fetchData();
+        checkLogin();
     }, []);
     const [elem, setelem] = useState(0);
     return (<>
-        <div id="main" className="h-screen w-full flex">
-            <div id="sideBar" className=' h-full w-[15%] bg-blue-700 overflow-hidden flex flex-col justify-center gap-12 items-end py-5 '>
+        <div id="main" className="h-screen w-full md:flex block">
+            <div id="sideBar" className='text-nowrap h-fit md:h-full w-full sticky top-0 z-[1000] md:w-[15%] bg-[#9bd4fa] overflow-hidden flex md:flex-col justify-center md:gap-12 gap-3 md:items-end py-5 flex-wrap '>
                 {
-                    ["Edit admin", "Edit course",  "Edit Campus"].map((item, key) => {
+                    ["Edit admin", "Edit course", "Edit Campus"].map((item, key) => {
+                        const isActive = (key === elem)
                         return (
-                            <>
-                                <div key={key} onClick={() => { setelem(key) }} className='text-2xl text-white font-["Noto_Sans"] hover:shadow-inner shadow shadow-blue-400 p-2 rounded-l-full px-5 cursor-pointer'>{item}</div>
-                            </>
+                            <div key={key} onClick={() => { setelem(key) }} className={`text-lg md:text-2xl  font-["Noto_Sans"] md:hover:shadow-inner shadow  md:shadow-blue-400 p-2 rounded-full md:rounded-none md:rounded-l-full px-3 w-fit cursor-pointer ${isActive ? "bg-white text-black" : "bg-blue-800 text-white"}`}>{item}</div>
+
                         )
                     })
                 }
             </div>
-            <div id='content' className='h-full w-[85%] overflow-y-scroll'  >
-                {(elem === 0) && <EditAdmin />}
-                {(elem === 1) && <EditCourse />}
-                {(elem === 2) && <EditCampus />}
+            <div id='content' className='h-full w-full md:w-[85%] overflow-y-scroll'  >
+                {(elem === 0) && <EditAdmin setLoading={setLoading} />}
+                {(elem === 1) && <EditCourse setLoading={setLoading} />}
+                {(elem === 2) && <EditCampus setLoading={setLoading} />}
             </div>
         </div>
     </>)
 }
-const EditAdmin = () => {
+const EditAdmin = ({ setLoading }) => {
     const [user, setuser] = useState("username");
     const [pass, setpass] = useState("****************");
     const [oldUser, setoldUser] = useState("");
@@ -135,12 +138,14 @@ const EditAdmin = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('https://cismbackend.onrender.com/admin', {
+                setLoading(prev => !prev)
+                const response = await axios.get('http://localhost:5000/admin', {
                     withCredentials: true // Include cookies in the request
                 });
+                setLoading(prev => !prev)
                 if (response.data.success) {
-                    setuser(response.data.data.username)
-                    setoldUser(response.data.data.username)
+                    setuser(response.data.data.username || "")
+                    setoldUser(response.data.data.username || "")
                 }
                 else {
                     throw new Error(response.data.data)
@@ -155,7 +160,9 @@ const EditAdmin = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.get('https://cismbackend.onrender.com/admin/edit', { oldUser, user, pass }, { withCredentials: true });
+            setLoading(prev => !prev)
+            const response = await axios.post('http://localhost:5000/admin/edit', { oldUser, user, pass }, { withCredentials: true });
+            setLoading(prev => !prev)
             if (response.data.success) {
                 toast.success(response.data.data);
                 navigate("/admin/logout")
@@ -168,9 +175,9 @@ const EditAdmin = () => {
     };
     return (
         <>
-            <div onSubmit={handleSubmit} className='h-full w-full  font-["Noto_Sans"] p-3 ' style={{ backgroundImage: `url(${imgCollege})`, backgroundRepeat: "no-repeat", backgroundPosition: "center", backgroundSize: "stretch" }}>
-                <form className='w-[400px] h-[450px] mx-auto mt-20 rounded bg-white shadow-lg shadow-slate-400 px-7 items-center justify-center flex flex-col gap-9 text-lg '>
-                    <label htmlFor="UserName" className='font-bold underline text-3xl text-[#5959c4]'>UserName</label>
+            <div className='h-full w-full  font-["Noto_Sans"] p-3 ' style={{ backgroundImage: `url(${imgCollege})`, backgroundRepeat: "no-repeat", backgroundPosition: "center", backgroundSize: "stretch" }}>
+                <form onSubmit={handleSubmit} className='w-[90%] md:w-[400px] h-[450px] mx-auto mt-20 rounded bg-white shadow-lg shadow-slate-400 px-7 items-center justify-center flex flex-col gap-9 text-lg '>
+                    <label htmlFor="UserName" className='font-bold underline text-3xl text-[#5959c4]'>User Edit</label>
                     <div className='mt-10 flex flex-col gap-2 w-full'>
                         <div className='text-[#5959c4]'>{"Username:"}</div>
                         <input type="text" ref={userInput} required disabled={isDisabled} className='bg-white outline-none border-[2px] border-black  rounded p-2' value={user} onChange={(e) => { setuser(e.target.value) }} />
@@ -188,23 +195,42 @@ const EditAdmin = () => {
         </>
     )
 }
-const EditCourse = () => {
+const EditCourse = ({ setLoading }) => {
     const [branches, setbranches] = useState([]);
     const [courses, setcourses] = useState([]);
     const [add, setAdd] = useState(false);
-    const [checked, setChecked] = useState(0);
-    const [newBranch, setnewBranch] = useState(branches[0]);
+    const [checkedB, setCheckedB] = useState(0);
+    const [newBranch, setnewBranch] = useState("");
     const [file, setFile] = useState(null);
     const [name, setname] = useState("");
     const [inputVisible, setinputVisible] = useState(false);
+    const fetchData = async () => {
+        try {
+            setLoading(prev => !prev)
+            let response = await axios.get("http://localhost:5000/admin/courses");
+            setLoading(prev => !prev)
+            if (response.data.success) {
+                setbranches(response.data.branches || [])
+                setnewBranch(response.data.branches[0] || "")
+                setcourses(response.data.courses || [])
+            }
+            else {
+                throw new Error(response.data.data)
+            }
+        }
+        catch (err) {
+            toast.error(err.message)
+        }
+    }
     const handleSubmit = async (e) => {
         e.preventDefault();
         const formData = new FormData();
         formData.append('name', name);
         formData.append('branch', newBranch);
         formData.append('image', file); // Assuming 'file' is the state variable for the selected file
+        setAdd(false)
         try {
-            const response = await axios.get('https://cismbackend.onrender.com/admin/courses/upload', formData, {
+            const response = await axios.post('http://localhost:5000/admin/courses/upload', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 },
@@ -214,8 +240,9 @@ const EditCourse = () => {
                 throw new Error(response.data.data)
             }
             else {
-                window.location.reload()
+                fetchData()
                 toast.success(response.data.data)
+                setbranches([])
             }
         } catch (error) {
             toast.error(error.message)
@@ -225,56 +252,53 @@ const EditCourse = () => {
         setFile(event.target.files[0])
     };
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                let response = await axios.get("/admin/courses");
-                setbranches(response.data.branches)
-                setnewBranch(response.data.branches[0])
-                setcourses(response.data.courses)
-            }
-            catch (err) {
-                toast.error(err.message)
-            }
-
-        }
+        console.log(branches);
+        
         fetchData()
     }, []);
+    useEffect(() => {
+        setCheckedB(0);
+        setinputVisible(false);
+        setname("")
+        setnewBranch(branches[0])
+        setFile(null)
+        setinputVisible(false)
+    }, [add]);
     return (
         <>
             <div className="h-full w-full">
                 <div className="w-full h-fit flex justify-end p-2">
-                    <div onClick={() => { if (add) { setChecked(-1); setinputVisible(false) } setAdd(prev => (!prev)) }} className=' px-2 cursor-pointer py-1 w-fit rounded bg-blue-800'>+ADD</div>
-
+                    <div onClick={() => { setAdd(prev => (!prev)) }} className=' px-2 cursor-pointer py-1 w-fit rounded bg-blue-800'>+ADD</div>
                 </div>
                 {add && <>
                     <div className=' w-[90%] mx-auto h-fit bg-white shadow-lg shadow-slate-600 p-9 rounded-lg'>
                         <form onSubmit={handleSubmit} className='w-full text-xl h-full flex flex-col gap-2'>
                             <div className=' text-2xl underline text-blue-600 '>Add New Course</div>
-                            <div className='branchOptions items-center flex gap-3 '>
+                            <div className='branchOptions md:items-center flex flex-col items-start md:flex-row gap-3 '>
                                 <div className=' px-4 rounded bg-blue-600 shadow shadow-blue-500'>Branches:</div>
                                 {
                                     branches.map((option, key) => {
-                                        return (<>
+                                        return (
                                             <label key={key} className='flex items-center gap-1'>
-                                                <input type="radio" className=' translate-y-[2px]' onClick={() => { setnewBranch(branches[key]); setChecked(key) }} name="color" value="yellow" checked={(key === checked)} />
+                                                <input type="radio" className=' translate-y-[2px]' onChange={() => { setnewBranch(branches[key]); setCheckedB(key) }} name="color" value="yellow" checked={(key === checkedB)} />
                                                 <div>{option}</div>
                                             </label>
-                                        </>)
+                                        )
                                     })
                                 }
-                                {(inputVisible || !branches[0]) && <input required className=' text-xl p-1 outline-none border-2 border-black rounded shadow-md shadow-slate-300 ' placeholder='Enter new Branch' type='text' value={newBranch} onChange={(e) => { setnewBranch(e.target.value) }} />}
-                                {!inputVisible && branches[0] && <div onClick={() => { if (!inputVisible) { setChecked(-1); setinputVisible(prev => (true)); setnewBranch("") } }} className=' px-2 cursor-pointer py-1 w-fit rounded bg-blue-800'>+ADD </div>}
+                                {(inputVisible || !branches[0]) && <input required className='w-full md:w-[20%] text-xl p-1 outline-none border-2 border-black rounded shadow-md shadow-slate-300 ' placeholder='Enter new Branch' type='text' value={newBranch} onChange={(e) => { setnewBranch(e.target.value) }} />}
+                                {!inputVisible && branches[0] && <div onClick={() => { if (!inputVisible) { setCheckedB(-1); setinputVisible(prev => (true)); setnewBranch("") } }} className=' px-2 cursor-pointer py-1 w-fit rounded bg-blue-800'>+ADD </div>}
                             </div>
-                            <div className="flex gap-2 items-center">
+                            <div className="flex flex-col items-start md:flex-row gap-2 md:items-center">
                                 <div className=' px-4 rounded h-fit bg-blue-600 shadow shadow-blue-500' > Course Name:</div>
-                                <input type="text" required placeholder="Enter course name" className='text-xl w-[20%] p-1 outline-none border-2 border-black rounded shadow-md shadow-slate-300' name="name" value={name} onChange={(e) => { setname(e.target.value) }} />
+                                <input type="text" required placeholder="Enter course name" className='text-xl w-full md:w-[20%] p-1 outline-none border-2 border-black rounded shadow-md shadow-slate-300' name="name" value={name} onChange={(e) => { setname(e.target.value) }} />
                             </div>
                             <div className=' px-4 rounded bg-blue-600 shadow shadow-blue-500 w-fit pr-24'>Image:</div>
                             <div className='w-full h-fit flex justify-center'>
                                 <label className=' bg-slate-300 relative overflow-hidden rounded w-[300px] h-[300px] flex items-center justify-center shadow-lg shadow-slate-500 cursor-pointer capitalize '>
                                     {file && <img src={URL.createObjectURL(file)} alt='#' className='w-full h-full absolute top-0 left-0' />}
                                     <div className='underline z-10'>Click To upload</div>
-                                    <input type="file" className='hidden' required name="image" onChange={handleFileChange} />
+                                    <input type="file" className='hidden' required accept='image/*' name="image" onChange={handleFileChange} />
                                 </label>
 
                             </div>
@@ -282,34 +306,24 @@ const EditCourse = () => {
                         </form>
                     </div>
                 </>}
-
                 {!branches[0] && <div className=' text-3xl mt-24 w-fit mx-auto'>No Data Available</div>} <div className=' w-full h-fit p-5'>
                     {
-                        branches.map((branch) => {
+                        branches?.map((branch, key) => {
                             return (
-                                <>
-                                    <div>
-                                        <p className=' text-3xl font-bold  bg-yellow-100 w-fit mb-3'>{branch}</p>
-                                        <hr className=' border-black border-1 mr-[50%] mb-12 rounded-full' />
-                                        <div className='w-full grid grid-cols-4 gap-20 mb-10'>
-                                            {
-                                                courses.filter(course => course.branch === branch).map((course) => {
-                                                    return (
-                                                        <>
-                                                            <div className='h-[275px] rounded-xl overflow-hidden relative'
-                                                                style={{ boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px" }}
-                                                            >
-                                                                <img src={`data:${course.picture.contentType};base64,${course.picture.data}`} alt="#" className=' w-full h-full' />
-                                                                <p className='absolute text-xl text-center h-[22%] w-full bottom-0 bg-blue-700 p-2'>{course.name}</p>
-                                                            </div>
-                                                        </>
-                                                    )
-                                                })
-                                            }
-                                        </div>
-                                    </div>
 
-                                </>
+                                <div key={key}>
+                                    <p className=' text-3xl font-bold uppercase  bg-yellow-100 w-fit mb-3'>{branch}</p>
+                                    <hr className=' border-black border-1 mr-[50%] mb-12 rounded-full' />
+                                    <div className='w-full flex flex-col items-center gap-4 mb-3 md:grid md:grid-cols-3 2xl:grid-cols-4 md:gap-20 md:mb-10'>
+                                        {
+                                            courses.filter(course => course.branch === branch)?.map((course, key) => {
+                                                return (
+                                                    <Course key={key} course={course} branch={branch} fetchData={fetchData}/>
+                                                )
+                                            })
+                                        }
+                                    </div>
+                                </div>
                             )
                         })
                     }
@@ -321,7 +335,96 @@ const EditCourse = () => {
     )
 }
 
-const EditCampus = () => {
+const Course = ({ course, branch,fetchData }) => {
+    const [editVisible, seteditVisible] = useState(false);
+    const [courseName, setcourseName] = useState(course.name || "");
+    const [disable, setdisable] = useState(true);
+    const [file, setfile] = useState(null);
+    const handleDelete=async ()=>{
+        try {
+            console.log(course);
+            const response = await axios.post('http://localhost:5000/admin/courses/delete', {_id:course._id}, {
+                withCredentials: true
+            });
+            if(response.data.success){
+                fetchData()
+                toast.success(response.data.data)
+            }
+            else{
+                throw new Error(response.data.data)
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+    const handleUpdate = async () => {
+        let formdata = new FormData()
+        formdata.append("_id",course._id)
+        formdata.append("name", courseName)
+        formdata.append("branch", branch)
+        if(file) formdata.append("image", file)
+        try {
+            const response = await axios.post('http://localhost:5000/admin/courses/upload', formdata, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                },
+                withCredentials: true
+            });
+            if(response.data.success){
+                fetchData()
+                toast.success(response.data.data)
+                setdisable(true);
+                setfile(null)
+                seteditVisible(false)
+            }
+            else{
+                throw new Error(response.data.data)
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+    return (
+        <div className='icon w-full h-fit'>
+            <div className=' cursor-pointer h-[300px] md:h-[275px]  rounded-xl overflow-hidden relative bg-white'
+                style={{ boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px" }}
+                onMouseEnter={() => { seteditVisible(true) }}
+                onMouseLeave={() => { seteditVisible(false) }}
+            >
+                <img src={file ? URL.createObjectURL(file) : `data:${course.picture.contentType};base64,${course.picture.data}`} alt="#" className=' w-full h-full' />
+                <label className='flex items-center w-full h-full absolute top-0 bg-transparent'>
+                    <input type="file" accept='image/*' className=' hidden' disabled={disable} onChange={(e) => { setfile(e.target.files[0]) }} />
+                    {(!disable) && <div className=' text-center text-xl w-fit bg-white px-2 rounded mx-auto cursor-pointer'>Click To Upload</div>}
+                </label>
+                <p className='absolute text-xl text-center h-[22%] w-full bottom-0 bg-blue-700 p-2 flex justify-center items-center'>
+                    <input type="text" value={courseName} disabled={disable} onChange={(e) => { setcourseName(e.target.value) }} className={` ${(disable) ? "bg-transparent" : "bg-white"} text-center text-wrap mx-auto`} />
+                </p>
+            </div>
+            <motion.div className='w-full h-10 flex items-baseline gap-4 px-3 text-3xl md:text-xl' initial="initial" animate={editVisible ? "final" : "initial"}
+                variants={{
+                    initial: {
+                        y: -10,
+                        opacity: 0,
+                    }
+                    , final: {
+                        y: 0,
+                        opacity: 1,
+                        transition: {
+                            duration: 0.5
+                        }
+                    }
+                }}
+                onMouseEnter={() => { seteditVisible(true) }}
+                onMouseLeave={() => { seteditVisible(false) }}
+            >
+                <i className="ri-edit-line cursor-pointer" onClick={() => { setdisable(prev => !prev) }}></i>
+                <i className="ri-delete-bin-fill cursor-pointer text-red-800" onClick={handleDelete}></i>
+                <span className='bg-blue-600 text-xl md:text-sm px-2 rounded cursor-pointer' onClick={handleUpdate}>Update</span>
+            </motion.div>
+        </div>
+    )
+}
+const EditCampus = ({ setLoading }) => {
     const [Name, setName] = useState([]);
     const [optionNum, setoptionNum] = useState(Math.floor(Name.length / 2));
     const [addVisible, setaddVisible] = useState(false);
@@ -396,10 +499,10 @@ const EditCampus = () => {
                             <button type="submit" className=' w-fit h-fit px-3 text-xl  text-white rounded font-mono bg-blue-500 cursor-pointer'>Upload</button>
                             <div onClick={() => { setaddVisible(prev => (!prev)); setnewName(""); setSelectedFiles([]) }} className=' w-fit h-fit px-3 text-xl  text-white rounded font-mono bg-blue-500 cursor-pointer'>Cancel</div>
                         </form>
-                        <div>{selectedFiles[0]&&<h2 className=' font-bold text-xl'>Selected Files:</h2>}
+                        <div>{selectedFiles[0] && <h2 className=' font-bold text-xl'>Selected Files:</h2>}
                             <div className=' flex items-center justify-center g-5 flex-wrap'>
                                 {selectedFiles.map((file, index) => (
-                                    <img key={index} src={URL.createObjectURL(file)} alt="#"  className=' w-[100px] h-[50px]'/>
+                                    <img key={index} src={URL.createObjectURL(file)} alt="#" className=' w-[100px] h-[50px]' />
                                 ))}
                             </div></div>
                     </div>
@@ -511,15 +614,27 @@ function SliderButton({ items, optionNum, setoptionNum }) {
     );
 }
 const Logout = () => {
+    const { setLoading } = useLoading()
     const navigate = useNavigate()
     useEffect(() => {
-        function clearSpecificCookie(cookieName) {
-            document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-            toast.success("You are successfully Logged out")
-            navigate("/admin")
+        async function logout() {
+            try {
+                setLoading(prev => !prev)
+                const response = await axios.get('http://localhost:5000/admin/logout', { withCredentials: true });
+                setLoading(prev => !prev)
+                navigate("/admin")
+                if (response.data.success) {
+                    toast.success(response.data.data)
+                }
+                else {
+                    throw new Error(response.data.data)
+                }
+            } catch (error) {
+                toast.error(error.message)
+            }
         }
-        clearSpecificCookie('token');
+        logout()
     }, []);
-
+    return (<></>)
 }
 export { Login, Register, Portal, Logout } 

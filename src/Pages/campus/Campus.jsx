@@ -9,7 +9,7 @@ const Campus = () => {
     useEffect(() => {
         const fetchNames = async () => {
             try {
-                let response = await axios.get('https://cismbackend.onrender.com/admin/campus/names')
+                let response = await axios.get('http://localhost:5000/admin/campus/names')
                 console.log(response)
                 if (!response.data.success) {
                     throw new Error(response.data.data)

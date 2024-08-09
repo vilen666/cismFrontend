@@ -20,6 +20,7 @@ const App = () => {
         <Route path='/admin' element={<Login/>}/>
         <Route path='/admin/register' element={<Register/>}/>
         <Route path='/admin/portal' element={<Portal/>}/>
+        <Route path='admin/logout' element={<Logout/>}/>
       </Routes>
     </BrowserRouter>
   )

@@ -11,4 +11,5 @@ html,body{
     height:100%;
     background-color: #C8DAE9;
     font-family: "Poppins";
+    overflow-x: hidden;
 }
