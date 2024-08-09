@@ -10,15 +10,15 @@ const Campus = () => {
         const fetchNames = async () => {
             try {
                 let response = await axios.get('http://localhost:5000/admin/campus/names')
-                console.log(response)
                 if (!response.data.success) {
                     throw new Error(response.data.data)
                 }
-                setName(response.data.campuses || [])
-                setoptionNum(Math.floor(response.data.campuses.length / 2))
+                else{
+                    setName(response.data.campuses || [])
+                    setoptionNum(Math.floor(response.data.campuses.length / 2))
+                }
             }
             catch (err) {
-                console.log(err)
                 toast.error(err.message)
             }
         }
@@ -69,9 +69,9 @@ function SliderButton({ items, optionNum, setoptionNum }) {
                 <button onClick={handleLeft} className='leftBut'><i className="ri-arrow-left-s-line"></i></button>
                 <div className=' w-fit h-fit bg-white flex gap-1 items-center overflow-hidden rounded p-2'>
                     {items.map((option, key) => {
-                        return (<>
+                        return (
                             <div onClick={() => { setoptionNum(key) }} style={{ transition: "1s easeInout" }} key={key} className={` bg-${(key === optionNum) && "blue-400"} px-4 py-2 rounded shadow-inner font-mono font-bold tracking-tighter cursor-pointer  border-black`}>{option.name}</div>
-                        </>)
+                       )
                     })}
                 </div>
                 <button onClick={handleRight} className='rightBut'><i className="ri-arrow-right-s-line"></i></button>
@@ -95,7 +95,7 @@ const [Pictures, setPictures] = useState([]);
   useEffect(() => {
     const fetchPictures = async () => {
         try {
-            let response = await axios.get('https://cismbackend.onrender.comadmin/campus/' + name)
+            let response = await axios.get('http://localhost:5000/admin/campus/' + name)
             if (!response.data.success) {
                 throw new Error(response.data.data)
             }

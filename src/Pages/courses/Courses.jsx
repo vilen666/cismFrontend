@@ -33,31 +33,27 @@ const Courses = () => {
             <Header/>
             <div className=' w-full h-fit p-5'>
                 {
-                    branches[0]?(branches.map((branch) => {
+                    branches[0]?(branches.map((branch,key) => {
                         return (
-                            <>
-                                <div>
+                                <div key={key}>
                                     <p className=' text-3xl font-bold  bg-yellow-100 w-fit mb-3 pr-[200px]'>{branch}</p>
                                     <hr className=' border-black border-1 mr-[50%] mb-12 rounded-full' />
                                     <div className='w-full grid grid-cols-4 gap-20 mb-10'>
                                         {
-                                            courses[0] && courses.filter(course => course.branch === branch).map((course) => {
+                                            courses[0] && courses.filter(course => course.branch === branch).map((course,key) => {
                                                 return (
-                                                    <>
-                                                        <div className='h-[275px] rounded-xl overflow-hidden relative'
+                                                        <div key={key} className='h-[275px] rounded-xl overflow-hidden relative'
                                                             style={{ boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px" }}
                                                         >
                                                             <img src={`data:${course.picture.contentType};base64,${course.picture.data}`} alt="#" className=' w-full h-full' />
                                                             <p className='absolute text-xl text-center h-[22%] w-full bottom-0 bg-blue-700 p-2'>{course.name}</p>
                                                         </div>
-                                                    </>
                                                 )
                                             })
                                         }
                                     </div>
                                 </div>
 
-                            </>
                         )
                     })):<div className=' text-xl md:text-3xl mt-24 w-fit mx-auto'>No Data Available</div>
                 }

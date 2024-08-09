@@ -25,7 +25,7 @@ const Footer = () => {
     ]
     return (
         <>
-            <div className=' h-fit w-full flex items-center justify-center mb-3'>
+            <div className=' h-fit w-full flex items-center justify-center mb-3 md:mt-2'>
                 <div className='bg-[#5794F0] h-fit md:h-[85%] w-[90%] flex flex-col md:flex-row items-center md:justify-between p-2 md:p-0 rounded-lg'>
                     <div className='flex items-center gap-3  w-fit'>
                         <img src={require("../imgs/1.png")} alt="#" className='w-24 md:w-[200px] h-auto' />

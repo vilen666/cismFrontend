@@ -3,7 +3,7 @@ import axios from 'axios';
 import "./Header.css"
 import logo from "../imgs/1.png"
 import { useLocation } from "react-router-dom";
-import { motion } from "framer-motion"
+import { delay, motion } from "framer-motion"
 const Header = () => {
   const location = useLocation()
   const navs = [
@@ -60,7 +60,7 @@ y:"-50%"
 }}
 const linkVar={
   hidden:{
-    height:"0",
+    height:0,
     opacity:0,
     y:-30,
   },
@@ -73,11 +73,13 @@ const linkVar={
 const linkUlVar={
   hidden:{
     opacity:0,
-    height:"0",
+    height:"auto",
     transition:{
+      delay:-0.2,
+      duration:0,
       staggerChildren:0.1,
-      duration:0.5,
       staggerDirection:-1,
+      when:"afterChildren"
     }
   },
   visible:{
@@ -91,7 +93,7 @@ const linkUlVar={
 }
   return (
     <>
-      <div className="h-fit bg-[#9bd4fa] p-2 pb-0 sticky top-0 z-20 md:bg-[#C8DAE9] w-full">
+      <div className="h-fit bg-[#9bd4fa] p-2 pb-0 sticky top-0 z-20 md:bg-[#C8DAE9] w-full md:mb-3">
         <div className=' header h-fit w-full flex items-center p-3 pb-1 gap-2'>
           <img src={logo} alt="#" className='w-11 md:w-[150px] h-[auto]' />
           <div className='details mb-1'>

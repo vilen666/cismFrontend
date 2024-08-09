@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 import { useNavigate } from 'react-router-dom';
 import imgCollege from "../home/imgs/3.png"
-import { motion } from "framer-motion"
+import { FlatTree, motion } from "framer-motion"
 import { useLoading } from '../..'
 const Login = () => {
     const [user, setUser] = useState('');
@@ -210,9 +210,9 @@ const EditCourse = ({ setLoading }) => {
             let response = await axios.get("http://localhost:5000/admin/courses");
             setLoading(prev => !prev)
             if (response.data.success) {
+                setcourses(response.data.courses || [])
                 setbranches(response.data.branches || [])
                 setnewBranch(response.data.branches[0] || "")
-                setcourses(response.data.courses || [])
             }
             else {
                 throw new Error(response.data.data)
@@ -252,15 +252,12 @@ const EditCourse = ({ setLoading }) => {
         setFile(event.target.files[0])
     };
     useEffect(() => {
-        console.log(branches);
-        
         fetchData()
     }, []);
     useEffect(() => {
         setCheckedB(0);
-        setinputVisible(false);
         setname("")
-        setnewBranch(branches[0])
+        branches[0] ? setnewBranch(branches[0]) : setnewBranch("")
         setFile(null)
         setinputVisible(false)
     }, [add]);
@@ -314,11 +311,11 @@ const EditCourse = ({ setLoading }) => {
                                 <div key={key}>
                                     <p className=' text-3xl font-bold uppercase  bg-yellow-100 w-fit mb-3'>{branch}</p>
                                     <hr className=' border-black border-1 mr-[50%] mb-12 rounded-full' />
-                                    <div className='w-full flex flex-col items-center gap-4 mb-3 md:grid md:grid-cols-3 2xl:grid-cols-4 md:gap-20 md:mb-10'>
+                                    <div className='"w-full flex flex-col items-center gap-4" mb-3 md:grid md:grid-cols-3 2xl:grid-cols-4 md:gap-20 md:mb-10'>
                                         {
-                                            courses.filter(course => course.branch === branch)?.map((course, key) => {
+                                            courses.filter(course => course.branch === branch)?.map((course, index) => {
                                                 return (
-                                                    <Course key={key} course={course} branch={branch} fetchData={fetchData}/>
+                                                    <Course key={index} course={course} branch={branch} setLoading={setLoading} fetchData={fetchData} />
                                                 )
                                             })
                                         }
@@ -335,22 +332,27 @@ const EditCourse = ({ setLoading }) => {
     )
 }
 
-const Course = ({ course, branch,fetchData }) => {
+const Course = ({ course, branch, fetchData, setLoading }) => {
     const [editVisible, seteditVisible] = useState(false);
-    const [courseName, setcourseName] = useState(course.name || "");
+    const [courseName, setcourseName] = useState("");
     const [disable, setdisable] = useState(true);
     const [file, setfile] = useState(null);
-    const handleDelete=async ()=>{
+    const ref = useRef()
+    useEffect(() => {
+        setcourseName(course.name)
+    }, [course]);
+    const handleDelete = async () => {
         try {
-            console.log(course);
-            const response = await axios.post('http://localhost:5000/admin/courses/delete', {_id:course._id}, {
+            setLoading(true)
+            const response = await axios.post('http://localhost:5000/admin/courses/delete', { _id: course._id }, {
                 withCredentials: true
             });
-            if(response.data.success){
-                fetchData()
+            setLoading(false)
+            if (response.data.success) {
                 toast.success(response.data.data)
+                fetchData()
             }
-            else{
+            else {
                 throw new Error(response.data.data)
             }
         } catch (error) {
@@ -359,25 +361,27 @@ const Course = ({ course, branch,fetchData }) => {
     }
     const handleUpdate = async () => {
         let formdata = new FormData()
-        formdata.append("_id",course._id)
+        formdata.append("_id", course._id)
         formdata.append("name", courseName)
         formdata.append("branch", branch)
-        if(file) formdata.append("image", file)
+        if (file) formdata.append("image", file)
         try {
+            setLoading(true)
             const response = await axios.post('http://localhost:5000/admin/courses/upload', formdata, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 },
                 withCredentials: true
             });
-            if(response.data.success){
+            setLoading(false)
+            if (response.data.success) {
                 fetchData()
                 toast.success(response.data.data)
                 setdisable(true);
                 setfile(null)
                 seteditVisible(false)
             }
-            else{
+            else {
                 throw new Error(response.data.data)
             }
         } catch (error) {
@@ -396,40 +400,58 @@ const Course = ({ course, branch,fetchData }) => {
                     <input type="file" accept='image/*' className=' hidden' disabled={disable} onChange={(e) => { setfile(e.target.files[0]) }} />
                     {(!disable) && <div className=' text-center text-xl w-fit bg-white px-2 rounded mx-auto cursor-pointer'>Click To Upload</div>}
                 </label>
-                <p className='absolute text-xl text-center h-[22%] w-full bottom-0 bg-blue-700 p-2 flex justify-center items-center'>
-                    <input type="text" value={courseName} disabled={disable} onChange={(e) => { setcourseName(e.target.value) }} className={` ${(disable) ? "bg-transparent" : "bg-white"} text-center text-wrap mx-auto`} />
+                <p className='absolute text-xl text-center min-h-[22%] max-h-fit w-full bottom-0 bg-blue-700 p-2 px-4 flex justify-center items-center'>
+                    <input type="text" value={courseName} disabled={disable} onChange={(e) => { setcourseName(e.target.value) }} className={` ${(disable) ? "bg-transparent" : "bg-white"} text-center text-wrap mx-auto min-w-3/4 max-w-[90%]`} />
                 </p>
             </div>
-            <motion.div className='w-full h-10 flex items-baseline gap-4 px-3 text-3xl md:text-xl' initial="initial" animate={editVisible ? "final" : "initial"}
+            <motion.div className='w-full h-10 -z-10 flex items-baseline gap-4 px-3 text-3xl md:text-xl overflow-hidden' initial="initial" animate={editVisible ? "final" : "initial"}
                 variants={{
                     initial: {
-                        y: -10,
                         opacity: 0,
+                        y: -50,
+                        height: 0,
                     }
                     , final: {
+                        height: "auto",
                         y: 0,
                         opacity: 1,
                         transition: {
-                            duration: 0.5
+                            duration: 0.3
                         }
                     }
                 }}
                 onMouseEnter={() => { seteditVisible(true) }}
                 onMouseLeave={() => { seteditVisible(false) }}
             >
-                <i className="ri-edit-line cursor-pointer" onClick={() => { setdisable(prev => !prev) }}></i>
+                <i className="ri-edit-line cursor-pointer" onClick={() => { ; setdisable(prev => !prev) }}></i>
                 <i className="ri-delete-bin-fill cursor-pointer text-red-800" onClick={handleDelete}></i>
-                <span className='bg-blue-600 text-xl md:text-sm px-2 rounded cursor-pointer' onClick={handleUpdate}>Update</span>
+                {
+                    !disable &&
+                    <span className='bg-blue-600 text-xl md:text-sm px-2 rounded cursor-pointer' onClick={handleUpdate}>Update</span>}
             </motion.div>
         </div>
     )
 }
 const EditCampus = ({ setLoading }) => {
     const [Name, setName] = useState([]);
-    const [optionNum, setoptionNum] = useState(Math.floor(Name.length / 2));
+    const [optionNum, setoptionNum] = useState(0);
     const [addVisible, setaddVisible] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [newname, setnewName] = useState("");
+    const fetchNames = async () => {
+        try {
+            let response = await axios.get('http://localhost:5000/admin/campus/names')
+            if (!response.data.success) {
+                throw new Error(response.data.data)
+            }
+            else {
+                setName(response.data.campuses || [])
+            }
+        }
+        catch (err) {
+            toast.error(err.message)
+        }
+    }
     const handleFileChange = (event) => {
         const filesArray = Array.from(event.target.files);
         setSelectedFiles(filesArray);
@@ -443,48 +465,48 @@ const EditCampus = ({ setLoading }) => {
         });
 
         try {
-            const response = await axios.get('https://cismbackend.onrender.com/admin/campus/upload', formData, {
+            setLoading(true)
+            const response = await axios.post('http://localhost:5000/admin/campus/upload', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
             });
+            setLoading(false)
             if (!response.data.success) {
                 throw new Error(response.data.data)
             }
-            window.location.reload()
-        } catch (error) {
+            else {
+                toast.success(response.data.data)
+                fetchNames()
+                setName("")
+                setSelectedFiles([])
+            }
+        }
+        catch (error) {
             toast.error(error.message)
         }
     };
     useEffect(() => {
-        const fetchNames = async () => {
-            try {
-                let response = await axios.get('https://cismbackend.onrender.com/admin/campus/names')
-                if (!response.data.success) {
-                    throw new Error(response.data.data)
-                }
-                setName(response.data.campuses)
-            }
-            catch (err) {
-                toast.error(err.message)
-            }
-        }
         fetchNames()
     }, []);
+    useEffect(() => {
+        setoptionNum(Math.floor(Name.length / 2))
+    }, [Name]);
     return (
         <>
             <div className=' w-full h-fit p-3'>
-                <div className="w-fit h-fit mx-auto">
+                {Name[0] ? <div className="w-fit h-fit mx-auto">
                     <SliderButton items={Name} optionNum={optionNum} setoptionNum={setoptionNum} />
-                </div>
-                {Name[optionNum] && <ImageSection name={Name[optionNum]?.name} key={Name[optionNum]?.name} />}
-                {!addVisible &&
-                    <div onClick={() => { setaddVisible(prev => (!prev)) }} className=' w-fit h-fit px-3 text-3xl  text-white rounded m-5 font-mono bg-blue-500 cursor-pointer'>ADD</div>}
+                </div> : <>
+                    <div className=' text-2xl text-center'>No Data Available</div>
+                </>}
+                {Name[optionNum] && <ImageSection setLoading={setLoading} name={Name[optionNum]?.name} key={Name[optionNum]?.name} fetchNames={fetchNames} />}
+                <div onClick={() => { setnewName(""); setSelectedFiles([]); setaddVisible(prev => (!prev)) }} className=' w-fit h-fit px-3 text-3xl  text-white rounded m-5 font-mono bg-blue-500 cursor-pointer'>ADD</div>
                 {addVisible && <>
                     <div className=' w-full min-h-[200px] bg-white rounded p-5 mt-3'>
-                        <form onSubmit={handleSubmit} className='text-xl flex items-center justify-center gap-2 text-nowrap'>
+                        <form onSubmit={handleSubmit} className='text-xl flex flex-col md:flex-row items-start md:items-center justify-center gap-2 text-nowrap'>
                             <input placeholder='Enter Name' type="text" required value={newname} onChange={(e) => { setnewName(e.target.value) }} className=' px-4 outline-none border-2 border-black rounded' />
-                            <label className=' bg-blue-500 rounded flex items-center justify-center h-fit text-white px-4 cursor-pointer'>
+                            <div className=' flex gap-2'><label className=' bg-blue-500 rounded flex items-center justify-center h-fit text-white px-4 cursor-pointer'>
                                 Add File
                                 <input
                                     type="file"
@@ -495,14 +517,13 @@ const EditCampus = ({ setLoading }) => {
                                     className='hidden'
                                 />
                             </label>
-
-                            <button type="submit" className=' w-fit h-fit px-3 text-xl  text-white rounded font-mono bg-blue-500 cursor-pointer'>Upload</button>
-                            <div onClick={() => { setaddVisible(prev => (!prev)); setnewName(""); setSelectedFiles([]) }} className=' w-fit h-fit px-3 text-xl  text-white rounded font-mono bg-blue-500 cursor-pointer'>Cancel</div>
+                                <button type="submit" className=' w-fit h-fit px-3 text-xl  text-white rounded font-mono bg-blue-500 cursor-pointer'>Upload</button>
+                                <div onClick={() => { setaddVisible(prev => (!prev)); setnewName(""); setSelectedFiles([]) }} className=' w-fit h-fit px-3 text-xl  text-white rounded font-mono bg-blue-500 cursor-pointer'>Cancel</div></div>
                         </form>
                         <div>{selectedFiles[0] && <h2 className=' font-bold text-xl'>Selected Files:</h2>}
-                            <div className=' flex items-center justify-center g-5 flex-wrap'>
+                            <div className='grid grid-cols-2 md:flex md:items-center md:justify-center g-5 flex-wrap'>
                                 {selectedFiles.map((file, index) => (
-                                    <img key={index} src={URL.createObjectURL(file)} alt="#" className=' w-[100px] h-[50px]' />
+                                    <img key={index} src={URL.createObjectURL(file)} alt="#" className='w-[200px] h-[100px]' />
                                 ))}
                             </div></div>
                     </div>
@@ -511,9 +532,27 @@ const EditCampus = ({ setLoading }) => {
         </>
     )
 }
-const ImageSection = ({ name }) => {
+const ImageSection = ({ name, setLoading,fetchNames }) => {
     const [Pictures, setPictures] = useState([]);
     const [newPictures, setnewPictures] = useState([]);
+    const [newName, setnewName] = useState("");
+    const [nameEdit, setnameEdit] = useState(false);
+    const fetchPictures = async () => {
+        try {
+            setLoading(true)
+            let response = await axios.get('http://localhost:5000/admin/campus/' + name)
+            setLoading(false)
+            if (!response.data.success) {
+                throw new Error(response.data.data)
+            }
+            else {
+                setPictures(response.data.pictures || [])
+            }
+        }
+        catch (err) {
+            toast.error(err.message)
+        }
+    }
     const handleUpdate = async () => {
         try {
             let formData = new FormData()
@@ -522,13 +561,15 @@ const ImageSection = ({ name }) => {
             })
             formData.append('pictures', JSON.stringify(Pictures))
             formData.append('name', name)
-            let response = await axios.get('https://cismbackend.onrender.com/admin/campus/update', formData,
+            setLoading(true)
+            let response = await axios.post('http://localhost:5000/admin/campus/update', formData,
                 {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     },
                     withCredentials: true
                 })
+            setLoading(false)
             if (!response.data.success) {
                 throw new Error(response.data.data)
             }
@@ -539,43 +580,48 @@ const ImageSection = ({ name }) => {
             toast.error(error.message)
         }
     }
-    useEffect(() => {
-        const fetchPictures = async () => {
-            try {
-                let response = await axios.get('https://cismbackend.onrender.com/admin/campus/' + name)
-                if (!response.data.success) {
-                    throw new Error(response.data.data)
-                }
-                setPictures(response.data.pictures)
+    const handleNameUpdate = async () => {
+        try {
+            let response = await axios.get('http://localhost:5000/admin/campus/updateName/'+name+"/"+newName,{
+                withCredentials:true
+            })
+            if(response.data.success){
+                toast.success(response.data.data)
+                setnameEdit(false)
+                fetchNames()
             }
-            catch (err) {
-                toast.error(err.message)
+            else{
+                throw new Error(response.data.data)
             }
+        } catch (error) {
+            toast.error(error.message)
         }
+    }
+    useEffect(() => {
+        setnewName(name)
         fetchPictures()
     }, [name]);
     return (
         <>
-            <div className="w-full min-h-[400px] rounded shadow-inner shadow-white bg-slate-50 p-5 gap-5 flex flex-wrap mt-6 items-center justify-center">
-                {Pictures[0] && Pictures.map(pic => (
-                    <>
-                        <img src={`data:${pic.contentType};base64,${pic.data}`} alt="#" className=' rounded w-[300px] h-[200px] ' />
-                    </>
+            <div className=' text-2xl 2xl:text-3xl bg-yellow-200 w-full md:w-fit px-3 py-2 flex md:items-center items-start flex-col md:flex-row gap-2  mt-2'><input type="text" className='max-w-fit bg-transparent' value={newName} onChange={(e) => { setnewName(e.target.value); setnameEdit(true) }} />
+                {nameEdit && <div onClick={handleNameUpdate} className=' bg-blue-500 w-fit px-3 rounded text-xl md:text-2xl text-white cursor-pointer'>UPDATE</div>}</div>
+            <div className="w-full min-h-[400px] rounded shadow-inner shadow-white bg-slate-50 p-5 gap-5 md:flex md:flex-wrap mt-1 md:items-center md:justify-center grid grid-cols-2">
+                {Pictures[0] && Pictures.map((pic, key) => (
+                    <img key={key} src={`data:${pic.contentType};base64,${pic.data}`} alt="#" className=' rounded w-[300px] h-[200px] ' />
                 ))}
-                {newPictures[0] && newPictures.map(pic => {
+                {newPictures[0] && newPictures.map((pic, key) => {
                     return (
-                        <>
-                            <img src={URL.createObjectURL(pic)} alt="#" className=' rounded w-[300px] h-[200px] ' />
-                        </>)
+                        <img key={key} src={URL.createObjectURL(pic)} alt="#" className=' rounded w-[300px] h-[200px] ' />
+                    )
                 })}
-                <div className='rounded w-[300px] h-[200px] bg-blue-400 text-white text-5xl text-center'>
+                <div className='rounded md:w-[300px] md:h-[200px] bg-blue-400 text-white text-5xl text-center'>
                     <label className='w-full h-full  cursor-pointer flex items-center justify-center font-mono'>
                         <input type="file" className='hidden' accept='image/*' onChange={(e) => { if (e.target.files[0]) setnewPictures(prev => ([...prev, e.target.files[0]])); }} />
                         <p>ADD</p>
                     </label>
                 </div>
             </div>
-            {newPictures[0] && <div onClick={handleUpdate} className=' bg-blue-500 w-fit px-3 rounded text-3xl text-white m-5 cursor-pointer'>UPDATE</div>}
+            {newPictures[0] && <div onClick={handleUpdate} className=' bg-blue-500 w-fit px-3 rounded text-xl md:text-2xl text-white m-5 cursor-pointer'>UPDATE</div>}
         </>
     )
 }
@@ -602,9 +648,9 @@ function SliderButton({ items, optionNum, setoptionNum }) {
                 <button onClick={handleLeft} className='leftBut'><i className="ri-arrow-left-s-line"></i></button>
                 <div className=' w-fit h-fit bg-white flex gap-1 items-center overflow-hidden rounded p-2'>
                     {items.map((option, key) => {
-                        return (<>
+                        return (
                             <div onClick={() => { setoptionNum(key) }} style={{ transition: "1s easeInout" }} key={key} className={` bg-${(key === optionNum) && "blue-400"} px-4 py-2 rounded shadow-inner font-mono font-bold tracking-tighter cursor-pointer  border-black`}>{option.name}</div>
-                        </>)
+                        )
                     })}
                 </div>
                 <button onClick={handleRight} className='rightBut'><i className="ri-arrow-right-s-line"></i></button>

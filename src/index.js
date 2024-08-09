@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import { Loader } from './Components/Loader/Loader';
+import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 const LoadingContext = createContext();
 export const useLoading = () => useContext(LoadingContext);
