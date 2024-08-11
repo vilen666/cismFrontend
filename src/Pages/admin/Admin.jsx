@@ -38,7 +38,7 @@ const Login = () => {
                         <input type="text" name="username" className='px-2 w-full mb-5 border-2 border-blue-800 rounded' onChange={(e) => setUser(e.target.value)} />
                         <label htmlFor="password" className=' w-full text-left font-bold uppercase'>Password</label>
                         <input type="text" name="password" className='px-2 w-full mb-5 border-2 border-blue-800 rounded' onChange={(e) => setPassword(e.target.value)} />
-                        <input type="submit" className=' w-[50%] bg-blue-600 rounded-full text-xl' value="Login" />
+                        <input type="submit" className=' w-[50%] bg-blue-600 rounded-full text-xl cursor-pointer' value="Login" />
                     </form>
                 </div>
             </div>
@@ -78,7 +78,7 @@ const Register = () => {
                         <input type="text" required name="username" className='px-2 w-full mb-5 border-2 border-blue-800 rounded' onChange={(e) => setUser(e.target.value)} />
                         <label htmlFor="password" className=' w-full text-left font-bold uppercase'>Password</label>
                         <input type="text" required name="password" className='px-2 w-full mb-5 border-2 border-blue-800 rounded' onChange={(e) => setPassword(e.target.value)} />
-                        <input type="submit" className=' w-[50%] bg-blue-600 rounded-full text-xl' value="Register" />
+                        <input type="submit" className=' w-[50%] bg-blue-600 rounded-full text-xl cursor-pointer' value="Register" />
                     </form>
                 </div>
             </div>
@@ -176,6 +176,7 @@ const EditAdmin = ({ setLoading }) => {
     return (
         <>
             <div className='h-full w-full  font-["Noto_Sans"] p-3 ' style={{ backgroundImage: `url(${imgCollege})`, backgroundRepeat: "no-repeat", backgroundPosition: "center", backgroundSize: "stretch" }}>
+                <div onClick={() => { navigate(("/admin/logout")) }} className=' text-lg md:text-2xl bg-blue-600 px-3 py-1 rounded w-fit mr-2 ml-auto mt-3 cursor-pointer text-white'>Logout</div>
                 <form onSubmit={handleSubmit} className='w-[90%] md:w-[400px] h-[450px] mx-auto mt-20 rounded bg-white shadow-lg shadow-slate-400 px-7 items-center justify-center flex flex-col gap-9 text-lg '>
                     <label htmlFor="UserName" className='font-bold underline text-3xl text-[#5959c4]'>User Edit</label>
                     <div className='mt-10 flex flex-col gap-2 w-full'>
@@ -187,7 +188,7 @@ const EditAdmin = ({ setLoading }) => {
                         <input type="text" disabled={isDisabled} className='bg-white outline-none border-[2px] border-black rounded p-2' value={pass} onChange={(e) => { setpass(e.target.value) }} />
                     </div>
                     <div className=' flex items-center gap-5 mt-3'>
-                        <button className='bg-[#0000b3] text-white rounded w-[100px] cursor-pointer' onClick={(e) => { e.preventDefault(); setisDisabled(!isDisabled); if (!isDisabled) { setpass("******") } else { setpass("") } }}>Edit</button>
+                        <button className='bg-[#0000b3] text-white rounded w-[100px] cursor-pointer' onClick={(e) => { e.preventDefault(); setisDisabled(prev => !prev); if (!isDisabled) { setpass("******") } else { setpass("") } }}>Edit</button>
                         {!isDisabled && <input className='bg-[#0000b3] text-white rounded w-[100px] cursor-pointer' type="submit" value="update" />}
                     </div>
                 </form>
@@ -337,7 +338,6 @@ const Course = ({ course, branch, fetchData, setLoading }) => {
     const [courseName, setcourseName] = useState("");
     const [disable, setdisable] = useState(true);
     const [file, setfile] = useState(null);
-    const ref = useRef()
     useEffect(() => {
         setcourseName(course.name)
     }, [course]);
@@ -389,7 +389,7 @@ const Course = ({ course, branch, fetchData, setLoading }) => {
         }
     }
     return (
-        <div className='icon w-full h-fit'>
+        <div className='icon w-full h-fit mb-2'>
             <div className=' cursor-pointer h-[300px] md:h-[275px]  rounded-xl overflow-hidden relative bg-white'
                 style={{ boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px" }}
                 onMouseEnter={() => { seteditVisible(true) }}
@@ -497,10 +497,10 @@ const EditCampus = ({ setLoading }) => {
             <div className=' w-full h-fit p-3'>
                 {Name[0] ? <div className="w-fit h-fit mx-auto">
                     <SliderButton items={Name} optionNum={optionNum} setoptionNum={setoptionNum} />
-                </div> : <>
+                </div> :
                     <div className=' text-2xl text-center'>No Data Available</div>
-                </>}
-                {Name[optionNum] && <ImageSection setLoading={setLoading} name={Name[optionNum]?.name} key={Name[optionNum]?.name} fetchNames={fetchNames} />}
+                }
+                {Name[optionNum] && <ImageSection setLoading={setLoading} name={Name[optionNum]} key={Name[optionNum]?.name} fetchNames={fetchNames} />}
                 <div onClick={() => { setnewName(""); setSelectedFiles([]); setaddVisible(prev => (!prev)) }} className=' w-fit h-fit px-3 text-3xl  text-white rounded m-5 font-mono bg-blue-500 cursor-pointer'>ADD</div>
                 {addVisible && <>
                     <div className=' w-full min-h-[200px] bg-white rounded p-5 mt-3'>
@@ -532,15 +532,16 @@ const EditCampus = ({ setLoading }) => {
         </>
     )
 }
-const ImageSection = ({ name, setLoading,fetchNames }) => {
+const ImageSection = ({ name, setLoading, fetchNames }) => {
     const [Pictures, setPictures] = useState([]);
     const [newPictures, setnewPictures] = useState([]);
     const [newName, setnewName] = useState("");
     const [nameEdit, setnameEdit] = useState(false);
+    const [deleteImg, setdeleteImg] = useState([]);
     const fetchPictures = async () => {
         try {
             setLoading(true)
-            let response = await axios.get('http://localhost:5000/admin/campus/' + name)
+            let response = await axios.get('http://localhost:5000/admin/campus/' + name.name)
             setLoading(false)
             if (!response.data.success) {
                 throw new Error(response.data.data)
@@ -555,26 +556,42 @@ const ImageSection = ({ name, setLoading,fetchNames }) => {
     }
     const handleUpdate = async () => {
         try {
-            let formData = new FormData()
-            newPictures.forEach(pic => {
-                formData.append('newPictures', pic)
-            })
-            formData.append('pictures', JSON.stringify(Pictures))
-            formData.append('name', name)
-            setLoading(true)
-            let response = await axios.post('http://localhost:5000/admin/campus/update', formData,
-                {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    },
-                    withCredentials: true
-                })
-            setLoading(false)
-            if (!response.data.success) {
-                throw new Error(response.data.data)
+            if (deleteImg[0]) {
+                setLoading(true)
+                let response = await axios.post('http://localhost:5000/admin/campus/deleteImg', { _id: name._id,picId:deleteImg },
+                    {
+                        withCredentials: true
+                    })
+                setLoading(false)
+                if (!response.data.success) {
+                    throw new Error(response.data.data)
+                }
+                else {
+                    toast.success(response.data.data)
+                }
             }
-            else {
-                window.location.reload()
+            if (newPictures[0]) {
+                let formData = new FormData()
+                newPictures.forEach(pic => {
+                    formData.append('newPictures', pic)
+                })
+                formData.append('pictures', JSON.stringify(Pictures))
+                formData.append('name', name)
+                setLoading(true)
+                let response = await axios.post('http://localhost:5000/admin/campus/update', formData,
+                    {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        },
+                        withCredentials: true
+                    })
+                setLoading(false)
+                if (!response.data.success) {
+                    throw new Error(response.data.data)
+                }
+                else {
+                    fetchPictures()
+                }
             }
         } catch (error) {
             toast.error(error.message)
@@ -582,15 +599,34 @@ const ImageSection = ({ name, setLoading,fetchNames }) => {
     }
     const handleNameUpdate = async () => {
         try {
-            let response = await axios.get('http://localhost:5000/admin/campus/updateName/'+name+"/"+newName,{
-                withCredentials:true
+            let response = await axios.get('http://localhost:5000/admin/campus/updateName/' + name + "/" + newName, {
+                withCredentials: true
             })
-            if(response.data.success){
+            if (response.data.success) {
                 toast.success(response.data.data)
                 setnameEdit(false)
                 fetchNames()
             }
-            else{
+            else {
+                throw new Error(response.data.data)
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+    const deleteCampus = async () => {
+        try {
+            setLoading(true)
+            // let response=""
+            let response = await axios.get("http://localhost:5000/admin/campus/campusDelete/" + name._id, {
+                withCredentials: true
+            })
+            setLoading(false)
+            if (response.data.success) {
+                toast.success(response.data.data)
+                fetchNames()
+            }
+            else {
                 throw new Error(response.data.data)
             }
         } catch (error) {
@@ -598,20 +634,20 @@ const ImageSection = ({ name, setLoading,fetchNames }) => {
         }
     }
     useEffect(() => {
-        setnewName(name)
+        setnewName(name.name)
         fetchPictures()
     }, [name]);
     return (
         <>
             <div className=' text-2xl 2xl:text-3xl bg-yellow-200 w-full md:w-fit px-3 py-2 flex md:items-center items-start flex-col md:flex-row gap-2  mt-2'><input type="text" className='max-w-fit bg-transparent' value={newName} onChange={(e) => { setnewName(e.target.value); setnameEdit(true) }} />
-                {nameEdit && <div onClick={handleNameUpdate} className=' bg-blue-500 w-fit px-3 rounded text-xl md:text-2xl text-white cursor-pointer'>UPDATE</div>}</div>
+                <div className='flex gap-3'>{nameEdit && <div onClick={handleNameUpdate} className=' bg-blue-500 w-fit px-3 rounded text-xl md:text-2xl text-white cursor-pointer'>UPDATE</div>}<i className="ri-close-circle-fill text-red-600 cursor-pointer" onClick={deleteCampus}></i></div></div>
             <div className="w-full min-h-[400px] rounded shadow-inner shadow-white bg-slate-50 p-5 gap-5 md:flex md:flex-wrap mt-1 md:items-center md:justify-center grid grid-cols-2">
                 {Pictures[0] && Pictures.map((pic, key) => (
-                    <img key={key} src={`data:${pic.contentType};base64,${pic.data}`} alt="#" className=' rounded w-[300px] h-[200px] ' />
+                    <EachImage key={key} pic={pic} name={name} setdeleteImg={setdeleteImg} setPictures={setPictures} />
                 ))}
                 {newPictures[0] && newPictures.map((pic, key) => {
                     return (
-                        <img key={key} src={URL.createObjectURL(pic)} alt="#" className=' rounded w-[300px] h-[200px] ' />
+                        <img src={URL.createObjectURL(pic)} alt="#" className=' rounded w-[300px] h-[200px] ' />
                     )
                 })}
                 <div className='rounded md:w-[300px] md:h-[200px] bg-blue-400 text-white text-5xl text-center'>
@@ -621,8 +657,33 @@ const ImageSection = ({ name, setLoading,fetchNames }) => {
                     </label>
                 </div>
             </div>
-            {newPictures[0] && <div onClick={handleUpdate} className=' bg-blue-500 w-fit px-3 rounded text-xl md:text-2xl text-white m-5 cursor-pointer'>UPDATE</div>}
+            {(newPictures[0] || deleteImg[0]) && <div onClick={handleUpdate} className=' bg-blue-500 w-fit px-3 rounded text-xl md:text-2xl text-white m-5 cursor-pointer'>UPDATE</div>}
         </>
+    )
+}
+const EachImage = ({ pic, setdeleteImg,setPictures }) => {
+    const [visible, setVisible] = useState(false);
+    const deleteVar = {
+        hidden: {
+            y: -100,
+            opacity: 0,
+            maxHeight: 0,
+        }
+        , visible: {
+            opacity: 1,
+            y: 0,
+            maxHeight: 100
+        }
+    }
+    return (
+        <div className='w-fit h-fit relative'>
+            <motion.i initial="hidden" animate={visible ? "visible" : "hidden"} variants={deleteVar} className="text-2xl text-red-600 ri-delete-bin-2-fill absolute z-10 left-1/2 top-1/2 transform -translate-y-1/2 -translate-x-1/2 cursor-pointer bg-white rounded-full px-2 py-1" onMouseEnter={() => { setVisible(true) }} onMouseLeave={() => { setVisible(false) }} onClick={() => { setdeleteImg(prev => [...prev, pic._id]);
+                setPictures(prev=>{
+                    return(prev.filter(item=>(item._id!==pic._id)))
+                })
+             }}></motion.i>
+            <img src={`data:${pic.contentType};base64,${pic.data}`} alt="#" className=' rounded w-[300px] h-[200px]' onMouseEnter={() => { setVisible(true) }} onMouseLeave={() => { setVisible(false) }} />
+        </div>
     )
 }
 function SliderButton({ items, optionNum, setoptionNum }) {

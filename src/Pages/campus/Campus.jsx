@@ -3,13 +3,17 @@ import Header from '../../Components/Header/Header';
 import Footer from '../../Components/Footer/Footer';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { useLoading } from '../..';
 const Campus = () => {
     const [Name, setName] = useState([]);
     const [optionNum, setoptionNum] = useState(0);
+    const {setLoading}=useLoading()
     useEffect(() => {
         const fetchNames = async () => {
             try {
+                setLoading(true)
                 let response = await axios.get('http://localhost:5000/admin/campus/names')
+                setLoading(false)
                 if (!response.data.success) {
                     throw new Error(response.data.data)
                 }
@@ -28,19 +32,19 @@ const Campus = () => {
         <>
         <Header/>
         <div className='w-full h-fit'>
-            <div className="w-full h-[400px] bg-no-repeat bg-center bg-cover" style={{ backgroundImage: `url(${require("./imgs/1.png")})` }}>
-                <div className='ml-[10%] w-fit pt-24 '>
-                    <p className='text-white text-3xl font-["CantoraOne"] '>Our Campus</p>
-                    <p className='text-white text-2xl font-["CantoraOne"] h-3/4 ml-[50px]'>Calcutta Institute of Engineering and <br /> Management offers one of the most <br /> beautiful, robust and high-tech campus <br /> in India. Various facilities are available for <br /> our students in our campus. </p>
+            <div className="w-full h-[400px] md:h-[400px] bg-no-repeat bg-center bg-cover bg-opacity-30" style={{ backgroundImage: `url(${require("./imgs/1.png")})` }}>
+                <div className='md:ml-[10%] w-fit pt-24 '>
+                    <p className='text-white text-lg md:text-3xl font-["CantoraOne"] '>Our Campus</p>
+                    <p className='text-white text-lg md:text-2xl font-["CantoraOne"] md:h-3/4 ml-[50px]'>Calcutta Institute of Engineering and <br /> Management offers one of the most <br /> beautiful, robust and high-tech campus <br /> in India. Various facilities are available for <br /> our students in our campus. </p>
                 </div>
             </div>
             <div className='w-full  my-8'>
             {Name[0]&&<><SliderButton items={Name} optionNum={optionNum} setoptionNum={setoptionNum} /></>}
-            {Name[optionNum] && <ImageSlider name={Name[optionNum]?.name} key={Name[optionNum]?.name} />}
+            {Name[optionNum] && <ImageSlider name={Name[optionNum]?.name} key={Name[optionNum]?.name} setLoading={setLoading}/>}
             
         </div>
         </div>
-      <hr className=' border-[4px] border-black mx-[45%] rounded-full mt-24'/>
+        <hr className=' border-[4px] border-black mx-[45%] rounded-full mt-5 mb-6 md:mt-24'/>
         <Footer/>
         </>
     )
@@ -81,10 +85,9 @@ function SliderButton({ items, optionNum, setoptionNum }) {
 }
 
 
-const ImageSlider = ({ name }) => {
+const ImageSlider = ({ name,setLoading }) => {
 const [Pictures, setPictures] = useState([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
   const nextSlide = () => {
     setCurrentImageIndex((prevIndex) => (prevIndex === Pictures.length - 1 ? 0 : prevIndex + 1));
   };
@@ -95,10 +98,13 @@ const [Pictures, setPictures] = useState([]);
   useEffect(() => {
     const fetchPictures = async () => {
         try {
+            setLoading(true)
             let response = await axios.get('http://localhost:5000/admin/campus/' + name)
+            setLoading(false)
             if (!response.data.success) {
                 throw new Error(response.data.data)
             }
+            else
             setPictures(response.data.pictures || [])
         }
         catch (err) {
@@ -117,11 +123,11 @@ if(Pictures[0])
           className="text-white text-lg focus:outline-none bg-gray-800 bg-opacity-50 hover:bg-opacity-75 px-3 py-1 rounded-lg"
           onClick={prevSlide}
         >
-          Previous
+          <i className="ri-arrow-left-s-line text-2xl"></i>
         </button>
-      <div className="w-[85%] h-[600px]">
+      <div className="w-[85%] h-fit">
         {Pictures[0]&&<img
-          className="w-full h-full object-cover transition-opacity duration-500 ease-in-out  rounded bg-white"
+          className="w-3/4 h-[200px]  md:h-[400px] mx-auto object-cover transition-opacity duration-500 ease-in-out  rounded bg-white"
           src={`data:${Pictures[currentImageIndex].contentType};base64,${Pictures[currentImageIndex].data}`}
           alt={`Slide ${currentImageIndex + 1}`}
         />}
@@ -130,10 +136,10 @@ if(Pictures[0])
           className="text-white text-lg focus:outline-none bg-gray-800 bg-opacity-50 hover:bg-opacity-75 px-3 py-1 rounded-lg"
           onClick={nextSlide}
         >
-          Next
+          <i className="ri-arrow-drop-right-line text-2xl"></i>
         </button>
         </div>
-        <div className=' font-bold text-2xl font-mono mx-auto w-fit mt-2'>{currentImageIndex+1} out of {Pictures.length+1}</div>
+        <div className=' font-bold text-2xl font-mono mx-auto w-fit mt-2'>{currentImageIndex+1} out of {Pictures.length}</div>
         </>
   );}
   else{
