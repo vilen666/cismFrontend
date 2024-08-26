@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useState } from 'react'
 import { toast } from 'react-toastify';
 import { useLoading } from '../..';
-
+const backUrl="https://cismbackend.onrender.com";
 const RequestCall = () => {
   const [name, setname] = useState("");
   const [phone, setphone] = useState("");
@@ -15,7 +15,7 @@ const RequestCall = () => {
     e.preventDefault();
     try {
       setLoading(true)
-      let response = await axios.post("http://localhost:5000/contact",{text:`Hello I am ${name}. Phone No.: ${phone}, Qualification: ${qualifi}, Marks Obtained: ${mark} out of ${fullMark} and I am Interested in ${choice}`})
+      let response = await axios.post(backUrl+"/contact",{text:`Hello I am ${name}. Phone No.: ${phone}, Qualification: ${qualifi}, Marks Obtained: ${mark} out of ${fullMark} and I am Interested in ${choice}`})
       setLoading(false)
       if(!response.data.success)
       {

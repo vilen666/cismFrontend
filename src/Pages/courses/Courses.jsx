@@ -5,7 +5,7 @@ import { useState,useEffect } from 'react'
 import { toast } from 'react-toastify'
 import axios from 'axios'
 import { useLoading } from '../..'
-
+const backUrl="https://cismbackend.onrender.com";
 const Courses = () => {
     const [branches, setbranches] = useState(Array(1).fill(null));
     const [courses, setcourses] = useState(Array(1).fill(null));
@@ -13,7 +13,7 @@ const Courses = () => {
     const fetchData = async () => {
         try {
             setLoading(prev=>!prev)
-            let response = await axios.get("http://localhost:5000/admin/courses");
+            let response = await axios.get(backUrl+"/admin/courses");
             setbranches(response.data.branches || [])
             setcourses(response.data.courses || [])
             setLoading(prev=>!prev)

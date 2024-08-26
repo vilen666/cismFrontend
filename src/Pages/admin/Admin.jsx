@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import imgCollege from "../home/imgs/3.png"
 import { FlatTree, motion } from "framer-motion"
 import { useLoading } from '../..'
+const backUrl="https://cismbackend.onrender.com";
+// const backUrl="http://localhost:5000"
 const Login = () => {
     const [user, setUser] = useState('');
     const [password, setPassword] = useState('');
@@ -15,7 +17,7 @@ const Login = () => {
         e.preventDefault();
         try {
             setLoading(prev => !prev)
-            const response = await axios.post('http://localhost:5000/admin/login', { user, password }, { withCredentials: true });
+            const response = await axios.post(backUrl+'/admin/login', { user, password }, { withCredentials: true });
             setLoading(prev => !prev)
             if (response.data.success) {
                 // Handle successful login (e.g., store token, redirect, etc.)
@@ -55,7 +57,7 @@ const Register = () => {
         e.preventDefault();
         try {
             setLoading(prev => !prev)
-            const response = await axios.post('http://localhost:5000/admin/register', { user, password });
+            const response = await axios.post(backUrl+'/admin/register', { user, password });
             setLoading(prev => !prev)
             if (response.data.success) {
                 toast.success(response.data.data);
@@ -92,7 +94,7 @@ const Portal = () => {
         const checkLogin = async () => {
             try {
                 setLoading(prev => !prev)
-                const response = await axios.get('http://localhost:5000/admin/portal', {
+                const response = await axios.get(backUrl+'/admin/portal', {
                     withCredentials: true // Include cookies in the request
                 });
                 setLoading(prev => !prev)
@@ -139,7 +141,7 @@ const EditAdmin = ({ setLoading }) => {
         const fetchData = async () => {
             try {
                 setLoading(prev => !prev)
-                const response = await axios.get('http://localhost:5000/admin', {
+                const response = await axios.get(backUrl+'/admin', {
                     withCredentials: true // Include cookies in the request
                 });
                 setLoading(prev => !prev)
@@ -161,7 +163,7 @@ const EditAdmin = ({ setLoading }) => {
         e.preventDefault();
         try {
             setLoading(prev => !prev)
-            const response = await axios.post('http://localhost:5000/admin/edit', { oldUser, user, pass }, { withCredentials: true });
+            const response = await axios.post(backUrl+'/admin/edit', { oldUser, user, pass }, { withCredentials: true });
             setLoading(prev => !prev)
             if (response.data.success) {
                 toast.success(response.data.data);
@@ -208,7 +210,7 @@ const EditCourse = ({ setLoading }) => {
     const fetchData = async () => {
         try {
             setLoading(prev => !prev)
-            let response = await axios.get("http://localhost:5000/admin/courses");
+            let response = await axios.get(backUrl+"/admin/courses");
             setLoading(prev => !prev)
             if (response.data.success) {
                 setcourses(response.data.courses || [])
@@ -231,7 +233,7 @@ const EditCourse = ({ setLoading }) => {
         formData.append('image', file); // Assuming 'file' is the state variable for the selected file
         setAdd(false)
         try {
-            const response = await axios.post('http://localhost:5000/admin/courses/upload', formData, {
+            const response = await axios.post(backUrl+'/admin/courses/upload', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 },
@@ -344,7 +346,7 @@ const Course = ({ course, branch, fetchData, setLoading }) => {
     const handleDelete = async () => {
         try {
             setLoading(true)
-            const response = await axios.post('http://localhost:5000/admin/courses/delete', { _id: course._id }, {
+            const response = await axios.post(backUrl+'/admin/courses/delete', { _id: course._id }, {
                 withCredentials: true
             });
             setLoading(false)
@@ -367,7 +369,7 @@ const Course = ({ course, branch, fetchData, setLoading }) => {
         if (file) formdata.append("image", file)
         try {
             setLoading(true)
-            const response = await axios.post('http://localhost:5000/admin/courses/upload', formdata, {
+            const response = await axios.post(backUrl+'/admin/courses/upload', formdata, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 },
@@ -440,7 +442,7 @@ const EditCampus = ({ setLoading }) => {
     const [newname, setnewName] = useState("");
     const fetchNames = async () => {
         try {
-            let response = await axios.get('http://localhost:5000/admin/campus/names')
+            let response = await axios.get(backUrl+'/admin/campus/names')
             if (!response.data.success) {
                 throw new Error(response.data.data)
             }
@@ -466,7 +468,7 @@ const EditCampus = ({ setLoading }) => {
 
         try {
             setLoading(true)
-            const response = await axios.post('http://localhost:5000/admin/campus/upload', formData, {
+            const response = await axios.post(backUrl+'/admin/campus/upload', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -541,7 +543,7 @@ const ImageSection = ({ name, setLoading, fetchNames }) => {
     const fetchPictures = async () => {
         try {
             setLoading(true)
-            let response = await axios.get('http://localhost:5000/admin/campus/' + name.name)
+            let response = await axios.get(backUrl+'/admin/campus/' + name.name)
             setLoading(false)
             if (!response.data.success) {
                 throw new Error(response.data.data)
@@ -558,7 +560,7 @@ const ImageSection = ({ name, setLoading, fetchNames }) => {
         try {
             if (deleteImg[0]) {
                 setLoading(true)
-                let response = await axios.post('http://localhost:5000/admin/campus/deleteImg', { _id: name._id,picId:deleteImg },
+                let response = await axios.post(backUrl+'/admin/campus/deleteImg', { _id: name._id,picId:deleteImg },
                     {
                         withCredentials: true
                     })
@@ -578,7 +580,7 @@ const ImageSection = ({ name, setLoading, fetchNames }) => {
                 formData.append('pictures', JSON.stringify(Pictures))
                 formData.append('name', name)
                 setLoading(true)
-                let response = await axios.post('http://localhost:5000/admin/campus/update', formData,
+                let response = await axios.post(backUrl+'/admin/campus/update', formData,
                     {
                         headers: {
                             'Content-Type': 'multipart/form-data'
@@ -599,7 +601,7 @@ const ImageSection = ({ name, setLoading, fetchNames }) => {
     }
     const handleNameUpdate = async () => {
         try {
-            let response = await axios.get('http://localhost:5000/admin/campus/updateName/' + name + "/" + newName, {
+            let response = await axios.get(backUrl+'/admin/campus/updateName/' + name.name + "/" + newName, {
                 withCredentials: true
             })
             if (response.data.success) {
@@ -618,7 +620,7 @@ const ImageSection = ({ name, setLoading, fetchNames }) => {
         try {
             setLoading(true)
             // let response=""
-            let response = await axios.get("http://localhost:5000/admin/campus/campusDelete/" + name._id, {
+            let response = await axios.get(backUrl+"/admin/campus/campusDelete/" + name._id, {
                 withCredentials: true
             })
             setLoading(false)
@@ -676,8 +678,8 @@ const EachImage = ({ pic, setdeleteImg,setPictures }) => {
         }
     }
     return (
-        <div className='w-fit h-fit relative'>
-            <motion.i initial="hidden" animate={visible ? "visible" : "hidden"} variants={deleteVar} className="text-2xl text-red-600 ri-delete-bin-2-fill absolute z-10 left-1/2 top-1/2 transform -translate-y-1/2 -translate-x-1/2 cursor-pointer bg-white rounded-full px-2 py-1" onMouseEnter={() => { setVisible(true) }} onMouseLeave={() => { setVisible(false) }} onClick={() => { setdeleteImg(prev => [...prev, pic._id]);
+        <div className='w-fit h-fit relative flex items-center justify-center'>
+            <motion.i initial="hidden" animate={visible ? "visible" : "hidden"} variants={deleteVar} className="text-2xl text-red-600 ri-delete-bin-2-fill absolute z-10 cursor-pointer bg-white rounded-full px-2 py-1" onMouseEnter={() => { setVisible(true) }}  onClick={() => { setdeleteImg(prev => [...prev, pic._id]);
                 setPictures(prev=>{
                     return(prev.filter(item=>(item._id!==pic._id)))
                 })
@@ -727,7 +729,7 @@ const Logout = () => {
         async function logout() {
             try {
                 setLoading(prev => !prev)
-                const response = await axios.get('http://localhost:5000/admin/logout', { withCredentials: true });
+                const response = await axios.get(backUrl+'/admin/logout', { withCredentials: true });
                 setLoading(prev => !prev)
                 navigate("/admin")
                 if (response.data.success) {

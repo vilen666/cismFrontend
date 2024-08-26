@@ -4,6 +4,7 @@ import Footer from '../../Components/Footer/Footer';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useLoading } from '../..';
+const backUrl="https://cismbackend.onrender.com";
 const Campus = () => {
     const [Name, setName] = useState([]);
     const [optionNum, setoptionNum] = useState(0);
@@ -12,7 +13,7 @@ const Campus = () => {
         const fetchNames = async () => {
             try {
                 setLoading(true)
-                let response = await axios.get('http://localhost:5000/admin/campus/names')
+                let response = await axios.get(backUrl+'/admin/campus/names')
                 setLoading(false)
                 if (!response.data.success) {
                     throw new Error(response.data.data)
@@ -99,7 +100,7 @@ const [Pictures, setPictures] = useState([]);
     const fetchPictures = async () => {
         try {
             setLoading(true)
-            let response = await axios.get('http://localhost:5000/admin/campus/' + name)
+            let response = await axios.get(backUrl+'/admin/campus/' + name)
             setLoading(false)
             if (!response.data.success) {
                 throw new Error(response.data.data)
